@@ -152,7 +152,7 @@ void calculer_matrice_transition2(Matrice *matrice,Matrice *matriceT){
       }
 
 
-       /* float *tab;
+        /*float *tab;
         tab=malloc(matrice->ligne*sizeof(tab));
         if(tab==NULL)
             fprintf(stderr, "malloc erreur");
@@ -308,21 +308,23 @@ void calcul_pageRank(Matrice *matrice,Matrice *Gout , Vecteur *vecteur1,Vecteur 
 
 }
 
+
 /*partie propagation de maladie*/
 
 void creer_graphe(Noeud *tab,Matrice *MatTransision){
     /*Cette fonction permet de creer un graphe*/
 
      int nbVoisin=0;
-     for (size_t j = 0; j < MatTransision->colonne; j++) {
+     int  j ,k,l=0;
+     for (j = 0; j < MatTransision->colonne; j++) {
 
            nbVoisin=0;
            Noeud node;
-           node.origine=j;
-           node.etat.sain
-           node.prob_infect=0.0;
+           node.valeur=j;
+           node.etat=sain;
+           node.prob_infect=5.0;
         
-           for (size_t i = 0; i < MatTransision->colonne; i++) {
+           for (int i = 0; i < MatTransision->colonne; i++) {
                    /*calcul de numbre de successeur*/
 
                   if (MatTransision->mat[j][i] !=0)
@@ -331,17 +333,25 @@ void creer_graphe(Noeud *tab,Matrice *MatTransision){
                   }
            }
 
-           node.suivant=malloc(sizeof*nbVoisin);
-
-           for (size_t k = 0; k < MatTransision->colonne; k++) {
+           printf("nb voisin de (%d) = %d \n",j,nbVoisin);
+           node.suivant=(int*)malloc(sizeof(int)*nbVoisin);
+            l=0;
+           for (k = 0; k < MatTransision->colonne; k++) {
                   
                    /*Construction de la liste des voisins */
                   if (MatTransision->mat[j][k] !=0)
                   {
-                        node.suivant[k]=k;
+     
+                        printf("(%d)------> (%d ):\n",j,k);
+                        node.suivant[l]=k;
+                        printf("suivant[%d]=%d\n",j,node.suivant[k]);
+                        l++;
+                         
                   }
+                  //printf("j=(%d) et k=(%d) \n",j,k);
             }
             
+            printf("into the fonction valeur=%d  etat=%u    pct=%f  \n",node.valeur,node.etat,node.prob_infect);
             tab[j]=node;
 
      }
@@ -350,26 +360,43 @@ void creer_graphe(Noeud *tab,Matrice *MatTransision){
 
 
 void infection(Noeud *tab,int aInfecter,int nbNoeud){
+      int n;
 
       /*Cette fonction permet d'infecter des noeud*/
 
-      for (int i = 0; i <  nbNoeud; ++i)
+      for (int i = 0; i < aInfecter; ++i)
       {
-        printf("hello world !");
-               
+            n = rand() % aInfecter + 1;
+            printf("Noeud porteur du virus initialement : %d \n",n);
+            tab[n].etat=infecté;
       }
 
+      
+    /*Propagation du virus*/
+    
 
+    printf("Propagation du virus\n");
 
-          
-      }
+    for (int i = 0; i < nbNoeud; ++i)
+    {
+        
+          if (tab[i].etat==infecté)
+          {
+              
+              for (int j = 0; j < tab[i].nbVoisin; ++j)
+              {
+                    /*infection des voisins*/
+                    tab[tab[i].suivant[j]].etat=infecté;
+                    tab[tab[i].suivant[j]].origine=i;
 
+                    printf("Noeud %d infecte le Noeud %d \n",i,tab[i].suivant[j]);
 
-
-
-
-
-
+              }
+                
+          }
+    }
+  
+}
 
 
 
