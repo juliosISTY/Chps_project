@@ -1,0 +1,13 @@
+# Directed graph (each unordered pair of nodes is saved once): dataset.txt 
+# Nodes: 5
+# FromNodeId	ToNodeId
+0 1
+1 0
+1 2
+2 0
+2 1
+2 4
+3 0
+4 1
+4 2
+4 3
