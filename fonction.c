@@ -355,11 +355,11 @@ void infection(Noeud *tab,int aInfecter,int nbNoeud){
 
       for (int i = 0; i <  nbNoeud; ++i)
       {
-          
+               
       }
 
 
-     /*propagation*/
+     /*propagation code*/
 
 
       
