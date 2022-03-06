@@ -19,9 +19,9 @@ typedef struct {
 
 enum Etat {
      sain,
-     infecté,
-     vacciné,
-     guéri
+     infecte,
+     vaccine,
+     gueri
 };
 
 typedef struct {

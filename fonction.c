@@ -351,7 +351,7 @@ void creer_graphe(Noeud *tab,Matrice *MatTransision){
 
 void infection(Noeud *tab,int aInfecter,int nbNoeud){
 
-      /*Cette fonction permet d'infecter des noeud*/
+      /*Cette fonction permet d'infecter des noeuds*/
 
       for (int i = 0; i <  nbNoeud; ++i)
       {
@@ -366,6 +366,55 @@ void infection(Noeud *tab,int aInfecter,int nbNoeud){
 
 
 
+/*partie vaccination des individus*/
+
+void vaccination(Vecteur *vectRang, Noeud *tab){
+
+    srand((int)time(NULL));
+
+
+    // cherche max tab de rangs
+    double max = vectRang->val[0];
+    for (int i = 0; i <  vectRang->taille_vecteur; ++i)
+      {
+        if (vectRang->val[i]>max)
+            max = vectRang->val[i];
+
+        if (tab[i]->origine==i)
+            tab[i]->prob_infect = vectRang->val[i];
+               
+      }
+    // compte le nombre le nbre d'individus ayant une proba d'infection entre [max; max-0.2]
+    int nbIndividus = 0;
+    for (int i = 0; i <  vectRang->taille_vecteur; ++i)
+      {
+        if (vectRang->val[i]>=(max - 0.2))
+            nbIndividus++;
+               
+      }
+
+    int y = rand() % 100 + 30;
+    int nbIndaVacc = (int) ((nbIndividus*y)/100);
+
+    // Vaccination
+    for (int i = 0; i <  vectRang->taille_vecteur; ++i)
+      {
+        if (vectRang->val[i]>=(max - 0.2))
+        {
+            if (tab[i]->origine==i)
+            {
+                tab[i]->etat=vaccine;
+                int val = rand() % 100 + 1;
+                if (val<=24)
+                    tab[i]->etat=gueri;
+
+            }
+        }
+               
+      }
+
+
+}
 
 
 
