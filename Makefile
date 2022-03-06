@@ -7,11 +7,11 @@ OBJ=$(SRC:.c=.o)
 all : $(EXEC)
 
 %.o : %.c
-	$(CC) -o $@ -c $<
+	$(CC) -o $@ -c $< -lm
 
 
 $(EXEC) : $(OBJ)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -lm
 
 
 clean :

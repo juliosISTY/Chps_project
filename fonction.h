@@ -17,16 +17,18 @@ typedef struct {
 	double **mat;
 } Matrice;
 
-enum Etat {
+typedef enum {
      sain,
-     infecte,
-     vaccine,
-     gueri
-};
+     infecté,
+     vacciné,
+     guéri
+
+}Etat;
 
 typedef struct {
 	int nbVoisin;
-	enum etat;
+	Etat etat;
+	int valeur;
 	double prob_infect;
      int origine;
 	int *suivant;
@@ -34,9 +36,10 @@ typedef struct {
 
 
 /*Definition des fonctions partie 2*/
-void creer_tableau(Noeud **tab,Matrice *MatTransision);
-void infection(Noeud **tab,Vecteur *Prob,double x);
+void creer_graphe(Noeud *tab,Matrice *MatTransision);
+void infection(Noeud *tab,int aInfecter,int nbNoeud);
 void Afficher_graphe(void);
+void vaccination(Noeud *tab, int nbreNoeud);
 
 
 

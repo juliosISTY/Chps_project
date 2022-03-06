@@ -152,7 +152,7 @@ void calculer_matrice_transition2(Matrice *matrice,Matrice *matriceT){
       }
 
 
-       /* float *tab;
+        /*float *tab;
         tab=malloc(matrice->ligne*sizeof(tab));
         if(tab==NULL)
             fprintf(stderr, "malloc erreur");
@@ -308,21 +308,27 @@ void calcul_pageRank(Matrice *matrice,Matrice *Gout , Vecteur *vecteur1,Vecteur 
 
 }
 
+
 /*partie propagation de maladie*/
 
 void creer_graphe(Noeud *tab,Matrice *MatTransision){
     /*Cette fonction permet de creer un graphe*/
 
+    srand( time( 0 ) );
+
      int nbVoisin=0;
-     for (size_t j = 0; j < MatTransision->colonne; j++) {
+     int  j ,k,l=0;
+     for (j = 0; j < MatTransision->colonne; j++) {
 
            nbVoisin=0;
            Noeud node;
-           node.origine=j;
-           node.etat.sain
-           node.prob_infect=0.0;
+           node.valeur=j;
+           node.etat=sain;
+           int num = (rand() % (6 - 0 + 1)) + 0;
+           printf("y= %d\n", num);
+           node.prob_infect=0.5;
         
-           for (size_t i = 0; i < MatTransision->colonne; i++) {
+           for (int i = 0; i < MatTransision->colonne; i++) {
                    /*calcul de numbre de successeur*/
 
                   if (MatTransision->mat[j][i] !=0)
@@ -331,17 +337,25 @@ void creer_graphe(Noeud *tab,Matrice *MatTransision){
                   }
            }
 
-           node.suivant=malloc(sizeof*nbVoisin);
-
-           for (size_t k = 0; k < MatTransision->colonne; k++) {
+           //printf("nb voisin de (%d) = %d \n",j,nbVoisin);
+           node.suivant=(int*)malloc(sizeof(int)*nbVoisin);
+            l=0;
+           for (k = 0; k < MatTransision->colonne; k++) {
                   
                    /*Construction de la liste des voisins */
                   if (MatTransision->mat[j][k] !=0)
                   {
-                        node.suivant[k]=k;
+     
+                        //printf("(%d)------> (%d ):\n",j,k);
+                        node.suivant[l]=k;
+                        //printf("suivant[%d]=%d\n",j,node.suivant[k]);
+                        l++;
+                         
                   }
+                  //printf("j=(%d) et k=(%d) \n",j,k);
             }
             
+            printf("into the fonction valeur=%d  etat=%u    pct=%f  \n",node.valeur,node.etat,node.prob_infect);
             tab[j]=node;
 
      }
@@ -350,17 +364,22 @@ void creer_graphe(Noeud *tab,Matrice *MatTransision){
 
 
 void infection(Noeud *tab,int aInfecter,int nbNoeud){
+      int n;
 
       /*Cette fonction permet d'infecter des noeuds*/
 
-      for (int i = 0; i <  nbNoeud; ++i)
+      for (int i = 0; i < aInfecter; ++i)
       {
-        printf("hello world !");
-               
+            n = rand() % aInfecter + 1;
+            printf("Noeud porteur du virus initialement : %d \n",n);
+            tab[n].etat=infecté;
       }
 
+      
+    /*Propagation du virus*/
+    
 
-
+    printf("Propagation du virus\n");
           
       }
 
@@ -368,48 +387,62 @@ void infection(Noeud *tab,int aInfecter,int nbNoeud){
 
 /*partie vaccination des individus*/
 
-void vaccination(Vecteur *vectRang, Noeud *tab){
+void vaccination(Noeud *tab, int nbreNoeud){
 
-    srand((int)time(NULL));
+    //srand((int)time(NULL));
+    printf("----------------------------------------------\n");
 
 
     // cherche max tab de rangs
-    double max = vectRang->val[0];
-    for (int i = 0; i <  vectRang->taille_vecteur; ++i)
+    double max = tab[0].prob_infect;
+    for (int i = 0; i <  nbreNoeud; ++i)
       {
-        if (vectRang->val[i]>max)
-            max = vectRang->val[i];
-
-        if (tab[i]->origine==i)
-            tab[i]->prob_infect = vectRang->val[i];
+        if (tab[i].prob_infect>max)
+            max = tab[i].prob_infect;
                
       }
+    printf("valeur max=%f  \n",max);
+    
     // compte le nombre le nbre d'individus ayant une proba d'infection entre [max; max-0.2]
     int nbIndividus = 0;
-    for (int i = 0; i <  vectRang->taille_vecteur; ++i)
+    for (int i = 0; i <  nbreNoeud; ++i)
       {
-        if (vectRang->val[i]>=(max - 0.2))
+        if (tab[i].prob_infect>=(max - 0.2))
             nbIndividus++;
                
       }
 
-    int y = rand() % 100 + 30;
+    printf("most infected individus = %d  \n",nbIndividus);
+
+    // 
+    int y = (rand()/(int) RAND_MAX)*(100-30)+30;
     int nbIndaVacc = (int) ((nbIndividus*y)/100);
 
+    printf("y = %d nbre individus à vacciner= %d  \n",y,nbIndaVacc);
+
     // Vaccination
-    for (int i = 0; i <  vectRang->taille_vecteur; ++i)
+    for (int i = 0; i <  nbreNoeud; ++i)
       {
-        if (vectRang->val[i]>=(max - 0.2))
+        if (tab[i].prob_infect>=(max - 0.2) && nbIndaVacc>0)
         {
-            if (tab[i]->origine==i)
+            if (tab[i].valeur==i)
             {
-                tab[i]->etat=vaccine;
-                int val = rand() % 100 + 1;
+                tab[i].etat=vacciné;
+                int val = (rand()/(int) RAND_MAX)*(100-1)+1;
+                printf("choix vaccination = %d  \n", val);
                 if (val<=24)
-                    tab[i]->etat=gueri;
+                    tab[i].etat=guéri;
+                    tab[i].prob_infect = 0.0;
 
             }
+            nbIndaVacc--;
         }
+
+        printf("etat des nodes valeur=%d  etat=%u    pct=%f  \n",tab[i].valeur,tab[i].etat,tab[i].prob_infect);
+        printf("----------------------------------------------\n");
+
+        if (nbIndaVacc==0)
+            break;
                
       }
 
@@ -417,8 +450,27 @@ void vaccination(Vecteur *vectRang, Noeud *tab){
 }
 
 
+/*=======
+    for (int i = 0; i < nbNoeud; ++i)
+    {
+        
+          if (tab[i].etat==infecté)
+          {
+              
+              for (int j = 0; j < tab[i].nbVoisin; ++j)
+              {
+                    //infection des voisins
+                    tab[tab[i].suivant[j]].etat=infecté;
+                    tab[tab[i].suivant[j]].origine=i;
+>>>>>>> f697dba457106ed7011d94b5cdb68b010495f8c4
 
+                    printf("Noeud %d infecte le Noeud %d \n",i,tab[i].suivant[j]);
 
+              }
+                
+          }
+    }*/
+  
 
 
 
