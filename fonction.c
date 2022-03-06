@@ -309,81 +309,6 @@ void calcul_pageRank(Matrice *matrice,Matrice *Gout , Vecteur *vecteur1,Vecteur 
 }
 
 
-/*partie propagation de maladie*/
-
-void creer_graphe(Noeud *tab,Matrice *MatTransision){
-    /*Cette fonction permet de creer un graphe*/
-
-    srand( time( 0 ) );
-
-     int nbVoisin=0;
-     int  j ,k,l=0;
-     for (j = 0; j < MatTransision->colonne; j++) {
-
-           nbVoisin=0;
-           Noeud node;
-           node.valeur=j;
-           node.etat=sain;
-           int num = (rand() % (6 - 0 + 1)) + 0;
-           printf("y= %d\n", num);
-           node.prob_infect=0.5;
-        
-           for (int i = 0; i < MatTransision->colonne; i++) {
-                   /*calcul de numbre de successeur*/
-
-                  if (MatTransision->mat[j][i] !=0)
-                  {
-                        nbVoisin++;
-                  }
-           }
-
-           //printf("nb voisin de (%d) = %d \n",j,nbVoisin);
-           node.suivant=(int*)malloc(sizeof(int)*nbVoisin);
-            l=0;
-           for (k = 0; k < MatTransision->colonne; k++) {
-                  
-                   /*Construction de la liste des voisins */
-                  if (MatTransision->mat[j][k] !=0)
-                  {
-     
-                        //printf("(%d)------> (%d ):\n",j,k);
-                        node.suivant[l]=k;
-                        //printf("suivant[%d]=%d\n",j,node.suivant[k]);
-                        l++;
-                         
-                  }
-                  //printf("j=(%d) et k=(%d) \n",j,k);
-            }
-            
-            printf("into the fonction valeur=%d  etat=%u    pct=%f  \n",node.valeur,node.etat,node.prob_infect);
-            tab[j]=node;
-
-     }
-
-}
-
-
-void infection(Noeud *tab,int aInfecter,int nbNoeud){
-      int n;
-
-      /*Cette fonction permet d'infecter des noeuds*/
-
-      for (int i = 0; i < aInfecter; ++i)
-      {
-            n = rand() % aInfecter + 1;
-            printf("Noeud porteur du virus initialement : %d \n",n);
-            tab[n].etat=infecté;
-      }
-
-      
-    /*Propagation du virus*/
-    
-
-    printf("Propagation du virus\n");
-          
-      }
-
-
 
 /*partie vaccination des individus*/
 
@@ -448,30 +373,6 @@ void vaccination(Noeud *tab, int nbreNoeud){
 
 
 }
-
-
-/*=======
-    for (int i = 0; i < nbNoeud; ++i)
-    {
-        
-          if (tab[i].etat==infecté)
-          {
-              
-              for (int j = 0; j < tab[i].nbVoisin; ++j)
-              {
-                    //infection des voisins
-                    tab[tab[i].suivant[j]].etat=infecté;
-                    tab[tab[i].suivant[j]].origine=i;
->>>>>>> f697dba457106ed7011d94b5cdb68b010495f8c4
-
-                    printf("Noeud %d infecte le Noeud %d \n",i,tab[i].suivant[j]);
-
-              }
-                
-          }
-    }*/
-  
-
 
 
 
