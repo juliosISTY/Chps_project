@@ -50,7 +50,9 @@ int main(int argc, char **argv)
            calculer_matrice_transition2(&matrice,&matriceT);
            afficher_matrice(&matriceT);
            creer_graphe(node,&matrice);
-           vaccination(node, atoi(argv[2]));
+           infection(node,3,atoi(argv[2]));
+
+           //vaccination(node, atoi(argv[2]));
            //printf(" succ=%d \n",node[4].suivant[0]);
            //printf("valeur=%d  etat=%u    pct=%f   succ= %d  \n",node[4].valeur,node[4].etat,node[4].prob_infect,node[4].suivant[0]);
             

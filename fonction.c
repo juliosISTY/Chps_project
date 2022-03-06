@@ -242,71 +242,178 @@ void vecteur_init0(Vecteur * v,int nbreNoeud){
 }
 
 
-void calcul_pageRank(Matrice *matrice,Matrice *Gout , Vecteur *vecteur1,Vecteur *vecteur2,int nbreNoeud,double dampingFactor,double tolerence){
-              /*Cette fonction permet calculer le pageRank amélioré */
-
-              double erreur=1.0;
-              int it=0;
-              double B=(1.0-dampingFactor)/nbreNoeud;//constante
 
 
-              printf("Valeur de B:= %f\n",B );
+/*partie propagation de maladie*/
 
+void creer_graphe(Noeud *tab,Matrice *MatTransision){
+    /*Cette fonction permet de creer un graphe*/
 
-              clock_t debut=clock();
-	          while(erreur > tolerence){
+     int nbVoisin=0;
+     int  j ,k,l=0;
+     for (j = 0; j < MatTransision->colonne; j++) {
 
+           nbVoisin=0;
+           Noeud node;
+           node.valeur=j;
+           node.etat=sain;
+           node.prob_infect=5.0;
+           node.transmis=faux;
+        
+           for (int i = 0; i < MatTransision->colonne; i++) {
+                   /*calcul de numbre de successeur*/
 
-                   erreur=0.0;
+                  if (MatTransision->mat[j][i] !=0)
+                  {
+                        nbVoisin++;
+                  }
+           }
 
+           printf("nb voisin de (%d) = %d \n",j,nbVoisin);
+           node.suivant=(int*)malloc(sizeof(int)*nbVoisin);
+            l=0;
+           for (k = 0; k < MatTransision->colonne; k++) {
+                  
+                   /*Construction de la liste des voisins */
+                  if (MatTransision->mat[j][k] !=0)
+                  {
+     
+                        printf("(%d)------> (%d ):\n",j,k);
+                        node.suivant[l]=k;
+                        printf("suivant[%d]=%d\n",j,node.suivant[k]);
+                        l++;
+                         
+                  }
+                  //printf("j=(%d) et k=(%d) \n",j,k);
+            }
+            
+            //printf("into the fonction valeur=%d  etat=%u    pct=%f   transmis=%u \n",node.valeur,node.etat,node.prob_infect,node.transmis);
+            node.nbVoisin=nbVoisin;
+            tab[j]=node;
 
-                 //cette boucle permet de calculer : Xk+1=d*P*X + ((1-d)/n)*GX
-                 for(int i =0; i < vecteur2->taille_vecteur; ++i) {
-
-                        for(int j =0; j <  vecteur2->taille_vecteur; ++j){
-
-
-                            vecteur2->val[i] += (dampingFactor*(matrice->mat[i][j] * vecteur1->val[j])) + (B*(Gout->mat[i][j]*vecteur1->val[j]));
-                        }
-
-	               }
-
-                    normaliser_vecteur(vecteur2);
-
-                    printf("------vecteur des rangs----------\n");
-                   afficher_vecteur(vecteur2);
-
-
-                   for (int i = 0; i < vecteur2->taille_vecteur; ++i)
-                   {
-
-                        double delta=vecteur2->val[i]-vecteur1->val[i];
-                        erreur+=pow(delta,2);
-
-                   }
-                       erreur=sqrt(erreur);
-
-
-
-                    printf("Valeur de l'erreur :=%.12f\n",erreur );
-
-
-                 for (int k = 0; k< vecteur1->taille_vecteur; ++k){
-                      vecteur1->val[k]=vecteur2->val[k];
-                 }
-
-                it+=1;
-
-                printf("Nombre d'itteration := %d\n",it );
-                generer_data_courbe(it,"data.txt");
-
-    }
-    clock_t fin=clock();
-    double temps=(double)(fin-debut)/CLOCKS_PER_SEC;
-
-   printf("temps execution:= %f\n",temps );
+     }
 
 }
+
+
+void infection(Noeud *tab,int aInfecter,int nbNoeud){
+    /*
+      Cette fonction simule la propagation du virus 
+      dans un grave
+    */
+
+      int n,last=-1;
+      int dejaVu[aInfecter];
+
+
+      /*Ce tableau va permettre de stocker des valeur deja tirer par le redome*/
+      for (int i = 0; i < aInfecter; ++i)
+                dejaVu[i]=-1;
+
+   
+      for (int i = 0; i < aInfecter; ++i){  
+
+
+                n = rand() % 4 + 1;
+                for (int i = 0; i < aInfecter; ++i)
+                {    
+                     while (dejaVu[i]==n)
+                     {
+                           n = rand() % 4 + 1;   
+                     }
+                    
+                      tab[n].etat=infecté;
+                }
+                printf("Le patients zero numero %d : %d \n",i,n);
+                dejaVu[i]=n;
+                 //int n = (rand()/(int) RAND_MAX)*(4-0)+0;   
+                // printf("Noeud porteur du virus initialement : %d \n",n);
+                 //tab[n].etat=infecté;
+                 //last=n;
+                
+        }
+           
+         
+    printf("Bilan des patients 0 :\n");
+    printf("------------------------------------------------------------------------------------\n");    
+    for (int i = 0; i < nbNoeud; ++i)
+    {
+        printf("Noeud: %d, status: %u   transmis: %u \n", tab[i].valeur,tab[i].etat,tab[i].transmis);
+    }
+      
+    /*Propagation du virus*/
+    
+
+    printf("Propagation du virus\n");
+    printf("------------------------------------------------------------------------------------\n"); 
+    int phase=0;
+
+    do{
+
+    for (int i = 0; i < nbNoeud; ++i){
+        
+          if (tab[i].etat==1 && tab[i].transmis==0)
+          {
+              tab[i].transmis=vrai;
+              for (int j = 0; j < tab[i].nbVoisin; ++j)
+              {
+                    /*infection des voisins*/
+
+                    printf("Le Noeud %d peut potentielement infecter le Noeud %d \n",i,tab[i].suivant[j]);
+
+                    n = rand() % 100 ;  
+                    printf("Probabilité := %d\n", n);
+                    
+                    if (n<= 80)
+                    {
+                        if (tab[tab[i].suivant[j]].etat!=1)
+                        {
+                      
+                            tab[tab[i].suivant[j]].etat=infecté;
+                            tab[tab[i].suivant[j]].origine=i;
+                            printf("Noeud %d infecte le Noeud %d \n",i,tab[i].suivant[j]);
+                        
+                        } 
+                     
+
+                    }
+                   
+              }
+     
+          }
+       }
+         
+
+        for (int i = 0; i < nbNoeud; ++i){
+        printf("Noeud: %d, status: %u   nbVoisin: %d    transmis: %u \n", tab[i].valeur,tab[i].etat,tab[i].nbVoisin,tab[i].transmis);
+        }
+
+       printf("Phase: %d\n",phase);
+
+        char rep,y='y',n='n';
+
+
+        do{
+
+          printf("Voulez-vous appliquer une  vaccination dans cette phase[y/n]: ");
+          scanf("%c",&rep);
+
+        }while(!strcmp(&rep,&y) || !strcmp(&rep,&n));
+
+        if (strcmp(&rep,&y))
+        {
+              
+              printf("Hello world !\n");            
+          
+        }
+
+      phase++;
+
+  }while(phase <5);
+
+
+}
+
 
 
 

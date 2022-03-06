@@ -25,9 +25,18 @@ typedef enum {
 
 }Etat;
 
+
+typedef enum {
+	faux,
+     vrai 
+}Bool;
+
+
+
 typedef struct {
 	int nbVoisin;
 	Etat etat;
+	Bool transmis;
 	int valeur;
 	double prob_infect;
      int origine;
@@ -40,6 +49,7 @@ void creer_graphe(Noeud *tab,Matrice *MatTransision);
 void infection(Noeud *tab,int aInfecter,int nbNoeud);
 void Afficher_graphe(void);
 void vaccination(Noeud *tab, int nbreNoeud);
+
 
 
 
